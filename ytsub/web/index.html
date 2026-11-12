@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>YTSub PC</title>
+<style>
+:root{--bg:#0f1115;--card:#171a21;--line:#262b36;--fg:#e8eaf0;--mut:#8b93a7;--acc:#ff4d4d;--acc2:#ffd84d;--ok:#3ecf8e;--err:#ff6b6b;--warn:#f5b748;--in:#0c0e12}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.45 "Segoe UI",system-ui,sans-serif}
+header{display:flex;align-items:center;gap:14px;padding:12px 18px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--bg);z-index:5}
+.logo{font-weight:700;font-size:17px;letter-spacing:.2px}.logo b{color:var(--acc)}
+.pill{font-size:12px;color:var(--mut);border:1px solid var(--line);border-radius:99px;padding:2px 10px;cursor:default}
+.pill.click{cursor:pointer}.pill.click:hover{border-color:var(--mut);color:var(--fg)}
+.grow{flex:1}
+main{display:grid;grid-template-columns:minmax(380px,1fr) minmax(420px,1.15fr);gap:16px;padding:16px 18px;max-width:1500px;margin:0 auto}
+@media(max-width:980px){main{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:16px}
+.card h2{font-size:14px;margin:0 0 10px;display:flex;align-items:center;gap:8px}
+.card h2 .sub{font-weight:400;color:var(--mut);font-size:12px}
+textarea,input[type=text],input[type=number],select{width:100%;background:var(--in);color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font:inherit}
+textarea{min-height:110px;resize:vertical;font-family:Consolas,monospace;font-size:12.5px}
+textarea:focus,input:focus,select:focus{outline:none;border-color:#4b5568}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.opts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
+.opts label{font-size:12px;color:var(--mut);display:flex;flex-direction:column;gap:4px}
+button{background:#232836;color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:7px 12px;font:inherit;cursor:pointer;white-space:nowrap}
+button:hover{border-color:#4b5568}button:disabled{opacity:.5;cursor:default}
+button.pri{background:var(--acc);border-color:var(--acc);color:#fff;font-weight:600}button.pri:hover{filter:brightness(1.1)}
+button.sm{padding:3px 9px;font-size:12px}
+button.ghost{background:transparent}
+.tabs{display:flex;gap:4px;margin-bottom:10px}
+.tabs button{background:transparent;border-color:transparent;color:var(--mut)}
+.tabs button.on{background:#232836;border-color:var(--line);color:var(--fg)}
+.badge{background:var(--acc);color:#fff;border-radius:99px;font-size:11px;padding:0 6px;margin-left:4px}
+.list{max-height:420px;overflow:auto;border:1px solid var(--line);border-radius:8px;background:var(--in)}
+.it{display:flex;gap:10px;align-items:center;padding:6px 10px;border-bottom:1px solid #1b1f28;cursor:pointer}
+.it:hover{background:#151922}.it:last-child{border-bottom:0}
+.it input{accent-color:var(--acc);width:15px;height:15px;flex:none}
+.it .t{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.it .m{color:var(--mut);font-size:12px;flex:none}
+.tag{font-size:10.5px;padding:0 6px;border-radius:4px;background:#2a3040;color:#b9c1d6;flex:none}
+.tag.s{background:#3a2430;color:#ff9db0}
+.empty{color:var(--mut);padding:22px;text-align:center;font-size:13px}
+.job{display:grid;grid-template-columns:96px 1fr auto;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
+.job:last-child{border-bottom:0}
+.job img,.job .ph{width:96px;height:54px;object-fit:cover;border-radius:6px;background:#222733}
+.job .ti{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.job .st{font-size:12px;color:var(--mut);margin-top:2px}
+.job.error .st{color:var(--err)}.job.done .st{color:var(--ok)}.job.skipped .st{color:var(--mut)}
+.bar{height:5px;background:#252a35;border-radius:9px;margin-top:6px;overflow:hidden}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--acc),#ff8a4d);width:0;transition:width .4s}
+.bar.ind i{width:35%;animation:ind 1.2s infinite ease-in-out}
+@keyframes ind{0%{margin-left:-35%}100%{margin-left:100%}}
+.warn{font-size:11.5px;color:var(--warn);margin-top:3px}
+.files{font-size:11.5px;margin-top:3px}.files a{color:#8fb4ff;cursor:pointer;margin-right:10px;text-decoration:none}.files a:hover{text-decoration:underline}
+.jbtn{display:flex;flex-direction:column;gap:4px}
+.stats{display:flex;gap:10px;font-size:12px;color:var(--mut);flex-wrap:wrap}
+.stats b{color:var(--fg)}
+details{border-top:1px solid var(--line);padding-top:10px;margin-top:4px}
+summary{cursor:pointer;font-weight:600;margin-bottom:8px}
+.set{display:grid;grid-template-columns:170px 1fr;gap:8px 12px;align-items:center;font-size:13px}
+.set .lbl{color:var(--mut)}
+.chk{display:flex;align-items:center;gap:6px;color:var(--fg);font-size:13px;cursor:pointer}
+.chk input{accent-color:var(--acc)}
+ol.steps{margin:6px 0 10px 18px;padding:0;color:#c9cfdc}ol.steps li{margin:4px 0}
+code{background:#232836;padding:1px 6px;border-radius:4px;font-size:12px}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#232836;border:1px solid var(--line);padding:9px 16px;border-radius:8px;opacity:0;transition:.25s;pointer-events:none;z-index:9}
+.toast.on{opacity:1}
+.muted{color:var(--mut);font-size:12px}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">YT<b>Sub</b> PC</div>
+  <span class="pill click" id="ytdlp" title="Bấm để cập nhật yt-dlp">yt-dlp …</span>
+  <span class="pill" id="ffmpeg">ffmpeg …</span>
+  <span class="muted" id="upd"></span>
+  <div class="grow"></div>
+  <button class="sm" id="openOut">📂 Mở thư mục tải</button>
+</header>
+
+<main>
+<section>
+  <div class="card">
+    <h2>Thêm link <span class="sub">mỗi dòng 1 link · video, Shorts, playlist hoặc kênh</span></h2>
+    <textarea id="links" placeholder="https://www.youtube.com/watch?v=...&#10;https://www.youtube.com/@tenkenh/videos&#10;https://www.youtube.com/playlist?list=..."></textarea>
+    <div class="opts">
+      <label>Tải
+        <select id="o_mode"><option value="subs">Chỉ phụ đề</option><option value="video">Video MP4</option><option value="audio">Âm thanh MP3</option></select></label>
+      <label>Chất lượng
+        <select id="o_quality"><option value="best">Cao nhất</option><option value="1080">1080p</option><option value="720">720p</option><option value="480">480p</option></select></label>
+      <label>Phụ đề
+        <select id="o_sub"></select></label>
+      <label>Cách gắn phụ đề
+        <select id="o_attach"><option value="srt">File .srt riêng</option><option value="soft">Nhúng vào MP4</option><option value="burn">In cứng lên video</option></select></label>
+      <label>Cỡ chữ (in cứng)
+        <select id="o_font"><option value="s">Nhỏ</option><option value="m">Vừa</option><option value="l">Lớn</option></select></label>
+      <label>Định dạng phụ đề
+        <select id="o_subfmt"><option value="srt">SRT</option><option value="txt">TXT (chỉ chữ)</option></select></label>
+    </div>
+    <div class="row">
+      <button class="pri" id="addDirect">⬇ Tải ngay tất cả link</button>
+      <button id="scan">🔍 Quét kênh / playlist để chọn</button>
+      <span class="muted" id="scanMsg"></span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="tabs">
+      <button id="tabScan" class="on">Kết quả quét</button>
+      <button id="tabInbox">Từ extension <span class="badge" id="inboxN" hidden>0</span></button>
+    </div>
+    <div class="row" style="margin-bottom:8px">
+      <input type="text" id="filter" placeholder="Lọc theo tên…" style="flex:1;min-width:140px">
+      <label class="chk"><input type="checkbox" id="fVideo" checked>Video</label>
+      <label class="chk"><input type="checkbox" id="fShort" checked>Shorts</label>
+    </div>
+    <div class="row" style="margin-bottom:8px">
+      <button class="sm" id="selAll">Chọn tất cả</button>
+      <button class="sm" id="selNone">Bỏ chọn</button>
+      <button class="sm ghost" id="pickClear">Xoá danh sách</button>
+      <div class="grow"></div>
+      <span class="muted" id="pickCount"></span>
+    </div>
+    <div class="list" id="pick"><div class="empty">Dán link kênh/playlist rồi bấm “Quét”, hoặc gửi link từ extension.</div></div>
+    <div class="row" style="margin-top:10px">
+      <button class="pri" id="addPicked" disabled>⬇ Tải các mục đã chọn</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <details id="setBox">
+      <summary>⚙ Cài đặt</summary>
+      <div class="set">
+        <span class="lbl">Thư mục lưu</span>
+        <div class="row"><input type="text" id="s_out_dir" style="flex:1"><button class="sm" id="pickDir">Chọn…</button></div>
+        <span class="lbl">Tải cùng lúc</span>
+        <select id="s_workers"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select>
+        <span class="lbl">Nghỉ giữa video (giây)</span>
+        <input type="number" id="s_sleep" min="0" max="60">
+        <span class="lbl">Ngôn ngữ phụ đề 1 / 2</span>
+        <div class="row"><input type="text" id="s_lang1" style="width:90px"><input type="text" id="s_lang2" style="width:90px"><span class="muted">mã: en, vi, ja, ko, zh-Hans…</span></div>
+        <span class="lbl">Lấy cookie trình duyệt</span>
+        <select id="s_cookies"><option value="">Không</option><option value="chrome">Chrome</option><option value="edge">Edge</option><option value="firefox">Firefox</option><option value="brave">Brave</option></select>
+        <span></span><label class="chk"><input type="checkbox" id="s_per_channel">Mỗi kênh một thư mục con</label>
+        <span></span><label class="chk"><input type="checkbox" id="s_skip_existing">Bỏ qua video đã tải trước đó</label>
+      </div>
+      <p class="muted">Cookie chỉ cần khi YouTube báo “Sign in to confirm…”. Với Chrome/Edge nên đóng trình duyệt trước khi tải.</p>
+    </details>
+    <details id="extBox">
+      <summary>🧩 Cài extension lấy link kênh</summary>
+      <ol class="steps">
+        <li>Bấm <button class="sm" id="openExt">Mở thư mục extension</button></li>
+        <li>Mở <code>chrome://extensions</code> (Chrome) hoặc <code>edge://extensions</code> (Edge), bật <b>Developer mode</b>.</li>
+        <li>Bấm <b>Load unpacked</b> → chọn thư mục <code>extension</code> vừa mở.</li>
+        <li>Vào trang kênh YouTube (tab Videos/Shorts), bấm biểu tượng <b>YTSub</b> trên thanh công cụ → quét → chọn → <b>Gửi vào YTSub</b>.</li>
+      </ol>
+      <p class="muted" id="extPath"></p>
+    </details>
+  </div>
+</section>
+
+<section>
+  <div class="card">
+    <h2>Hàng đợi <span class="sub" id="qsum"></span></h2>
+    <div class="row" style="margin-bottom:6px">
+      <div class="tabs" id="qtabs" style="margin:0">
+        <button data-f="all" class="on">Tất cả</button><button data-f="active">Đang tải</button>
+        <button data-f="error">Lỗi</button><button data-f="done">Xong</button>
+      </div>
+      <div class="grow"></div>
+      <button class="sm" id="retryAll">↻ Thử lại lỗi</button>
+      <button class="sm" id="cancelAll">✕ Huỷ hết</button>
+      <button class="sm ghost" id="clearDone">Dọn mục đã xong</button>
+    </div>
+    <div id="jobs"><div class="empty">Chưa có gì trong hàng đợi.</div></div>
+  </div>
+</section>
+</main>
+<div class="toast" id="toast"></div>
+
+<script>
+const $ = s => document.querySelector(s);
+const LN = {en:'Anh',vi:'Việt',ja:'Nhật',ko:'Hàn','zh-Hans':'Trung',fr:'Pháp',de:'Đức',es:'Tây Ban Nha'};
+let S = null, pick = {src:'scan', scan:[], inbox:[], sel:new Set()}, inboxRev = -1, qf = 'all';
+
+async function api(path, body){
+  const r = await fetch(path, body===undefined ? {} : {method:'POST', headers:{'Content-Type':'application/json','X-YTSub':'1'}, body:JSON.stringify(body)});
+  const j = await r.json(); if (j.error) throw new Error(j.error); return j;
+}
+function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('on'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('on'),2600); }
+const esc = s => String(s??'').replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const dur = s => { if(!s) return ''; s=Math.round(s); const h=s/3600|0,m=(s%3600)/60|0,x=s%60; return (h?h+':'+String(m).padStart(2,'0'):m)+':'+String(x).padStart(2,'0'); };
+const urlsIn = t => [...new Set(t.split(/\s+/).map(x=>x.trim()).filter(x=>/^https?:\/\//.test(x)))];
+
+// ---------- tuỳ chọn tải (lưu làm mặc định, extension cũng dùng)
+const OPT = ['mode','quality','sub','attach','font','subfmt'];
+function fillSubSelect(){
+  const a=LN[S.lang1]||S.lang1, b=LN[S.lang2]||S.lang2, v=$('#o_sub').value||S.defaults.sub;
+  $('#o_sub').innerHTML = `<option value="orig">Gốc (theo ngôn ngữ video)</option><option value="none">Không</option><option value="l1">${esc(a)}</option><option value="l2">${esc(b)}</option><option value="both">Song ngữ ${esc(a)}–${esc(b)}</option>`;
+  $('#o_sub').value = v;
+}
+function curOpts(){ const o={}; OPT.forEach(k=>o[k]=$('#o_'+k).value); return o; }
+function syncOptUI(){
+  const m=$('#o_mode').value;
+  $('#o_quality').disabled = m!=='video'; $('#o_attach').disabled = m!=='video';
+  $('#o_font').disabled = !(m==='video' && $('#o_attach').value==='burn');
+  $('#o_subfmt').disabled = m!=='subs';
+}
+OPT.forEach(k=>$('#o_'+k).addEventListener('change', async()=>{ syncOptUI(); await api('/api/settings',{defaults:curOpts()}); }));
+
+// ---------- cài đặt
+const SET = ['out_dir','workers','sleep','lang1','lang2','cookies','per_channel','skip_existing'];
+function fillSettings(){
+  SET.forEach(k=>{ const el=$('#s_'+k); if(el.type==='checkbox') el.checked=!!S[k]; else if(document.activeElement!==el) el.value=S[k]; });
+}
+SET.forEach(k=>$('#s_'+k).addEventListener('change', async e=>{
+  const el=e.target; let v = el.type==='checkbox'?el.checked:el.value;
+  if(k==='workers'||k==='sleep') v=Number(v)||0;
+  const r=await api('/api/settings',{[k]:v}); S=r.settings; fillSubSelect(); toast('Đã lưu cài đặt');
+}));
+$('#pickDir').onclick = async()=>{ const r=await api('/api/pickdir',{}); if(r.dir){ $('#s_out_dir').value=r.dir; S.out_dir=r.dir; toast('Đã đổi thư mục lưu'); } };
+$('#openOut').onclick = ()=>api('/api/open',{});
+$('#openExt').onclick = ()=>api('/api/open_ext',{});
+$('#ytdlp').onclick = async()=>{ await api('/api/update',{}); toast('Đang cập nhật yt-dlp…'); };
+
+// ---------- thêm link
+$('#addDirect').onclick = async()=>{
+  const u=urlsIn($('#links').value); if(!u.length) return toast('Chưa có link nào');
+  const single=[], lists=[];
+  u.forEach(x=> (/[?&]list=|\/@|\/channel\/|\/c\/|\/user\/|\/playlist/.test(x) && !/\/shorts\//.test(x) ? lists:single).push(x));
+  let added=0;
+  if(single.length) added += (await api('/api/enqueue',{items:single, opts:curOpts()})).added;
+  for(const l of lists){
+    $('#scanMsg').textContent='Đang lấy danh sách '+l.slice(0,50)+'…';
+    try{ const r=await api('/api/list',{url:l}); added += (await api('/api/enqueue',{items:r.items, opts:curOpts()})).added; }
+    catch(e){ toast('Lỗi: '+e.message); }
+  }
+  $('#scanMsg').textContent=''; $('#links').value=''; toast(`Đã thêm ${added} video vào hàng đợi`); refreshJobs();
+};
+$('#scan').onclick = async()=>{
+  const u=urlsIn($('#links').value); if(!u.length) return toast('Dán link kênh/playlist trước');
+  $('#scan').disabled=true; let all=[], seen=new Set(pick.scan.map(x=>x.url));
+  try{
+    for(const l of u){
+      $('#scanMsg').textContent='Đang quét '+l.slice(0,60)+'… (kênh lớn có thể mất 10–60 giây)';
+      try{ const r=await api('/api/list',{url:l}); r.items.forEach(i=>{ if(!seen.has(i.url)){ seen.add(i.url); all.push(i);} }); }
+      catch(e){ toast('Lỗi quét: '+e.message); }
+    }
+    pick.scan = pick.scan.concat(all); all.forEach(i=>pick.sel.add(i.url));
+    setSrc('scan'); $('#scanMsg').textContent=`Tìm thấy ${all.length} video mới`;
+  } finally { $('#scan').disabled=false; }
+};
+
+// ---------- danh sách chọn
+function setSrc(s){ pick.src=s; $('#tabScan').classList.toggle('on',s==='scan'); $('#tabInbox').classList.toggle('on',s==='inbox'); renderPick(); }
+$('#tabScan').onclick=()=>setSrc('scan'); $('#tabInbox').onclick=()=>setSrc('inbox');
+function visible(){
+  const q=$('#filter').value.toLowerCase().trim(), v=$('#fVideo').checked, sh=$('#fShort').checked;
+  return pick[pick.src].filter(i=> (i.short?sh:v) && (!q || (i.title||'').toLowerCase().includes(q)));
+}
+function renderPick(){
+  const items=visible(), box=$('#pick');
+  if(!pick[pick.src].length){ box.innerHTML=`<div class="empty">${pick.src==='scan'?'Dán link kênh/playlist rồi bấm “Quét”.':'Chưa có link nào từ extension.'}</div>`; }
+  else box.innerHTML = items.map(i=>`<label class="it" data-u="${esc(i.url)}"><input type="checkbox" ${pick.sel.has(i.url)?'checked':''}>
+    <span class="t" title="${esc(i.title)}">${esc(i.title)}</span>${i.short?'<span class="tag s">Shorts</span>':(i.tab&&i.tab!=='Videos'?`<span class="tag">${esc(i.tab)}</span>`:'')}
+    <span class="m">${dur(i.duration)}</span></label>`).join('') || '<div class="empty">Không có mục nào khớp bộ lọc.</div>';
+  const nSel = pick[pick.src].filter(i=>pick.sel.has(i.url)).length;
+  $('#pickCount').textContent = `${nSel} đã chọn / ${pick[pick.src].length}`;
+  $('#addPicked').disabled = !nSel;
+}
+$('#pick').addEventListener('change', e=>{ const u=e.target.closest('.it')?.dataset.u; if(!u) return; e.target.checked?pick.sel.add(u):pick.sel.delete(u); renderPick(); });
+['#filter','#fVideo','#fShort'].forEach(s=>$(s).addEventListener('input',renderPick));
+$('#selAll').onclick=()=>{ visible().forEach(i=>pick.sel.add(i.url)); renderPick(); };
+$('#selNone').onclick=()=>{ visible().forEach(i=>pick.sel.delete(i.url)); renderPick(); };
+$('#pickClear').onclick=async()=>{ if(pick.src==='inbox'){ await api('/api/inbox/clear',{}); pick.inbox=[]; } else pick.scan=[]; renderPick(); };
+$('#addPicked').onclick=async()=>{
+  const items=pick[pick.src].filter(i=>pick.sel.has(i.url));
+  const r=await api('/api/enqueue',{items, opts:curOpts()});
+  items.forEach(i=>pick.sel.delete(i.url));
+  if(pick.src==='inbox'){ await api('/api/inbox/clear',{urls:items.map(i=>i.url)}); pick.inbox=pick.inbox.filter(i=>!items.includes(i)); }
+  else pick.scan=pick.scan.filter(i=>!items.includes(i));
+  renderPick(); toast(`Đã thêm ${r.added} video vào hàng đợi`); refreshJobs();
+};
+
+// ---------- hàng đợi
+const STL = {queued:'Đang chờ',running:'',done:'Xong',error:'Lỗi',canceled:'Đã huỷ',skipped:'Bỏ qua'};
+document.querySelectorAll('#qtabs button').forEach(b=>b.onclick=()=>{ qf=b.dataset.f; document.querySelectorAll('#qtabs button').forEach(x=>x.classList.toggle('on',x===b)); refreshJobs(); });
+$('#retryAll').onclick=()=>api('/api/retry_failed',{}).then(refreshJobs);
+$('#cancelAll').onclick=()=>{ if(confirm('Huỷ tất cả video đang chờ và đang tải?')) api('/api/cancel_all',{}).then(refreshJobs); };
+$('#clearDone').onclick=()=>api('/api/clear',{}).then(refreshJobs);
+$('#jobs').addEventListener('click', e=>{
+  const b=e.target.closest('[data-act]'); if(!b) return;
+  const id=b.closest('.job')?.dataset.id, a=b.dataset.act;
+  if(a==='cancel') api('/api/cancel',{id}).then(refreshJobs);
+  if(a==='retry') api('/api/retry',{id}).then(refreshJobs);
+  if(a==='open') api('/api/open',{path:b.dataset.p});
+});
+const nodes = new Map();
+function jobHTML(j){
+  const i=j.info||{}, t=i.title||j.url, ind = j.status==='running' && j.pct==null;
+  const stage = j.status==='running' ? j.stage + (j.pct!=null?` ${j.pct.toFixed(0)}%`:'') : (j.status==='error'?j.error:(STL[j.status]||j.stage));
+  return `${i.thumbnail?`<img src="${esc(i.thumbnail)}" loading="lazy">`:'<div class="ph"></div>'}
+  <div style="min-width:0"><div class="ti" title="${esc(t)}">${esc(t)}</div>
+   <div class="st">${esc(stage)}${i.uploader?` · <span class="muted">${esc(i.uploader)}</span>`:''}</div>
+   ${j.status==='running'||j.status==='queued'?`<div class="bar ${ind?'ind':''}"><i style="width:${ind?35:(j.pct||0)}%"></i></div>`:''}
+   ${j.warnings.length?`<div class="warn" title="${esc(j.warnings.join('\n'))}">⚠ ${esc(j.warnings[0])}${j.warnings.length>1?` (+${j.warnings.length-1})`:''}</div>`:''}
+   ${j.files.length?`<div class="files">${j.files.map(f=>`<a data-act="open" data-p="${esc(f)}">${esc(f.split(/[\\/]/).pop().replace(/^.*\]/,'…]'))}</a>`).join('')}</div>`:''}
+  </div>
+  <div class="jbtn">${j.status==='queued'||j.status==='running'?'<button class="sm" data-act="cancel">Huỷ</button>':''}
+   ${j.status==='error'||j.status==='canceled'?'<button class="sm" data-act="retry">Thử lại</button>':''}</div>`;
+}
+async function refreshJobs(){
+  let r; try{ r=await api('/api/jobs'); }catch{ return; }
+  const st=r.stats, tot=Object.values(st).reduce((a,b)=>a+b,0);
+  $('#qsum').innerHTML = tot?`<span class="stats"><span><b>${tot}</b> tổng</span><span><b>${st.running||0}</b> đang tải</span><span><b>${st.queued||0}</b> chờ</span><span><b>${(st.done||0)+(st.skipped||0)}</b> xong</span><span><b>${st.error||0}</b> lỗi</span></span>`:'';
+  const show = r.jobs.filter(j=> qf==='all' || (qf==='active'?['queued','running'].includes(j.status): qf==='done'?['done','skipped'].includes(j.status): j.status===qf));
+  const box=$('#jobs');
+  if(!show.length){ box.innerHTML='<div class="empty">Chưa có gì ở đây.</div>'; nodes.clear(); return; }
+  if(box.querySelector('.empty')) box.innerHTML='';
+  const keep=new Set(show.map(j=>j.id));
+  for(const [id,el] of nodes) if(!keep.has(id)){ el.remove(); nodes.delete(id); }
+  show.forEach((j,idx)=>{
+    let el=nodes.get(j.id); const h=jobHTML(j);
+    if(!el){ el=document.createElement('div'); el.className='job'; el.dataset.id=j.id; nodes.set(j.id,el); }
+    el.className='job '+j.status;
+    if(el._h!==h){ el.innerHTML=h; el._h=h; }
+    if(box.children[idx]!==el) box.insertBefore(el, box.children[idx]||null);
+  });
+}
+
+// ---------- trạng thái chung
+async function refreshStatus(){
+  let r; try{ r=await api('/api/status'); }catch{ $('#ytdlp').textContent='mất kết nối app'; return; }
+  const first=!S; S=r.settings;
+  $('#ytdlp').textContent = r.ytdlp ? 'yt-dlp '+r.ytdlp+' ⟳' : 'yt-dlp: chưa có';
+  $('#ffmpeg').textContent = r.ffmpeg ? 'ffmpeg ✓' : 'ffmpeg ✗ (không ghép/in phụ đề được)';
+  $('#ffmpeg').style.color = r.ffmpeg ? '' : 'var(--err)';
+  $('#upd').textContent = r.update||'';
+  $('#extPath').textContent = 'Thư mục: '+r.ext_dir;
+  if(first){ OPT.forEach(k=>{ if(k!=='sub') $('#o_'+k).value=S.defaults[k]; }); fillSubSelect(); syncOptUI(); fillSettings(); }
+  $('#inboxN').hidden = !r.inbox_count; $('#inboxN').textContent=r.inbox_count;
+  if(r.inbox_rev!==inboxRev){
+    const fresh = inboxRev!==-1; inboxRev=r.inbox_rev;
+    const ib=await api('/api/inbox'); const old=new Set(pick.inbox.map(i=>i.url));
+    ib.items.forEach(i=>{ if(!old.has(i.url)) pick.sel.add(i.url); }); pick.inbox=ib.items;
+    if(fresh && ib.items.length){ setSrc('inbox'); toast(`Extension vừa gửi link · ${ib.items.length} mục chờ duyệt`); } else renderPick();
+  }
+}
+refreshStatus(); refreshJobs();
+setInterval(refreshStatus, 2000); setInterval(refreshJobs, 1000);
+</script>
+</body>
+</html>

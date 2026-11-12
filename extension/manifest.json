@@ -1,0 +1,11 @@
+{
+  "manifest_version": 3,
+  "name": "YTSub – lấy link video kênh",
+  "version": "1.0.0",
+  "description": "Quét & chọn link video/Shorts trên YouTube rồi gửi vào app YTSub PC để tải video và phụ đề hàng loạt.",
+  "permissions": ["activeTab", "scripting", "contextMenus"],
+  "host_permissions": ["http://127.0.0.1:8765/*", "https://www.youtube.com/*", "https://m.youtube.com/*"],
+  "background": { "service_worker": "bg.js" },
+  "action": { "default_title": "YTSub: lấy link video" },
+  "icons": { "16": "icon16.png", "48": "icon48.png", "128": "icon128.png" }
+}
