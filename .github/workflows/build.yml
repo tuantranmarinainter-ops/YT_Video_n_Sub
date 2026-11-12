@@ -1,0 +1,59 @@
+name: Build Windows exe
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Test
+        run: python -m unittest discover -s tests -v
+
+      - name: Tải yt-dlp.exe và ffmpeg.exe (bản essentials)
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force bin | Out-Null
+          Invoke-WebRequest https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe -OutFile bin/yt-dlp.exe
+          Invoke-WebRequest https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip -OutFile ff.zip
+          Expand-Archive ff.zip -DestinationPath ff
+          Copy-Item (Get-ChildItem ff -Recurse -Filter ffmpeg.exe | Select-Object -First 1).FullName bin/ffmpeg.exe
+          bin/yt-dlp.exe --version
+          bin/ffmpeg.exe -version | Select-Object -First 1
+
+      - name: Build
+        shell: cmd
+        run: build.bat
+
+      - name: Nén
+        shell: pwsh
+        run: |
+          $v = "1.0.${{ github.run_number }}"
+          echo "VER=$v" >> $env:GITHUB_ENV
+          Compress-Archive -Path dist/YTSub-PC -DestinationPath "YTSub-PC-$v-win64.zip"
+          Compress-Archive -Path extension/* -DestinationPath "YTSub-extension-$v.zip"
+
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ env.VER }}
+          name: YTSub PC v${{ env.VER }}
+          body: |
+            **Tải `YTSub-PC-${{ env.VER }}-win64.zip`** → giải nén → chạy `YTSub-PC.exe` (đã kèm yt-dlp, ffmpeg và thư mục `extension`).
+            Cài extension: Chrome `chrome://extensions` / Edge `edge://extensions` → bật Developer mode → Load unpacked → chọn thư mục `extension`.
+
+            Commit: ${{ github.sha }}
+          files: |
+            YTSub-PC-${{ env.VER }}-win64.zip
+            YTSub-extension-${{ env.VER }}.zip

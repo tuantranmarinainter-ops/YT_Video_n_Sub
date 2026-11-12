@@ -3,6 +3,10 @@
 Bản PC của [Apk-YT-download](https://github.com/tuantranmarinainter-ops/Apk-YT-download): yt-dlp + FFmpeg,
 giao diện web chạy trên máy (http://127.0.0.1:8765), kèm extension Chrome/Edge để lấy link video của kênh.
 
+## Tải về
+Vào **[Releases mới nhất](../../releases/latest)** → tải `YTSub-PC-…-win64.zip` → giải nén.
+Mỗi lần push lên `main`, GitHub Actions tự build và tạo Release mới (`.github/workflows/build.yml`).
+
 ## Chạy
 - Bản đóng gói: mở `YTSub-PC.exe` (giữ cửa sổ đen mở trong lúc tải; đóng nó là thoát app).
 - Từ mã nguồn: `run.bat` (cần Python 3.10+ và ffmpeg trong PATH hoặc `bin\ffmpeg.exe`).
